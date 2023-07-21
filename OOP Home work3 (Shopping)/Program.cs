@@ -1,33 +1,55 @@
 ﻿using OOP_Home_work3__Shopping_;
 using System.Text.Json;
 
-var manager = new ShoppingListManager();
+ShoppingListManager manager = new ShoppingListManager();
 
-// Создаем новый список покупок
-manager.AddList("Список покупок на неделю");
-
-// Добавляем элементы в список покупок
-manager.AddItem("Список покупок на неделю", "Хлеб");
-manager.AddItem("Список покупок на неделю", "Молоко");
-manager.AddItem("Список покупок на неделю", "Яйца");
-
-// Получаем список покупок
-var items = manager.GetItems("Список покупок на неделю");
-foreach (var item in items)
+int choice = 0;
+do
 {
-    Console.WriteLine(item);
-}
-var shoppingList = new ShoppingList ("Список покупок на неделю")
-{
-    Name = "Список покупок на неделю",
-    Items = new List<string> { "Хлеб", "Молоко", "Яйца" }
-};
+    Console.WriteLine("Меню:");
+    Console.WriteLine("1. Создать новый список покупок");
+    Console.WriteLine("2. Добавить элементы из другого списка");
+    Console.WriteLine("3. Вывести список покупок");
+    Console.WriteLine("4. Сохранить списки покупок в файл");
+    Console.WriteLine("5. Загрузить списки покупок из файла");
+    Console.WriteLine("6. Выход");
 
-var options = new JsonSerializerOptions
-{
-    WriteIndented = true
-};
+    Console.Write("Выберите действие: ");
+    choice = Convert.ToInt32(Console.ReadLine());
 
-string jsonString = JsonSerializer.Serialize(shoppingList, options);
+    switch (choice)
+    {
+        case 1:
+            Console.Write("Введите имя нового списка покупок: ");
+            string newListName = Console.ReadLine();
+            manager.CreateNewList(newListName);
+            break;
+        case 2:
+            Console.Write("Введите имя списка покупок, в который нужно добавить элементы: ");
+            string listName = Console.ReadLine();
+            Console.Write("Введите элементы для добавления (через запятую): ");
+            List<string> items = new List<string>(Console.ReadLine().Split(','));
+            manager.AddItemsFromList(listName, items);
+            break;
+        case 3:
+            Console.Write("Введите имя списка покупок для вывода: ");
+            string printListName = Console.ReadLine();
+            manager.PrintList(printListName);
+            break;
+        case 4:
+            manager.SaveListsToJson();
+            break;
+        case 5:
+            manager.LoadListsFromJson();
+            break;
+        case 6:
+            Console.WriteLine("Выход из программы");
+            break;
+        default:
+            Console.WriteLine("Неверный выбор");
+            break;
+    }
 
-File.WriteAllText("shoppingList.json", jsonString);
+    Console.WriteLine();
+} while (choice != 6);
+    

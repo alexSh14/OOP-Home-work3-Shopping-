@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.IO;
+using Newtonsoft.Json;
 namespace OOP_Home_work3__Shopping_
 {
-    class ShoppingListManager
+    public class ShoppingListManager
     {
         private List<ShoppingList> shoppingLists;
 
@@ -15,24 +13,64 @@ namespace OOP_Home_work3__Shopping_
             shoppingLists = new List<ShoppingList>();
         }
 
-        public void AddList(string name)
+        public void CreateNewList(string name)
         {
-            shoppingLists.Add(new ShoppingList(name));
+            ShoppingList newList = new ShoppingList(name);
+            shoppingLists.Add(newList);
+            Console.WriteLine($"Создан новый список покупок с именем: {name}");
         }
 
-        public void AddItem(string listName, string item)
+        public void AddItemsFromList(string name, List<string> items)
         {
-            var shoppingList = shoppingLists.FirstOrDefault(sl => sl.Name == listName);
-            if (shoppingList != null)
+            ShoppingList list = shoppingLists.Find(x => x.Name == name);
+            if (list != null)
             {
-                shoppingList.Items.Add(item);
+                list.Items.AddRange(items);
+                Console.WriteLine($"Добавлены элементы в список покупок: {string.Join(", ", items)}");
+            }
+            else
+            {
+                Console.WriteLine($"Список покупок с именем {name} не найден");
             }
         }
 
-        public List<string> GetItems(string listName)
+        public void PrintList(string name)
         {
-            var shoppingList = shoppingLists.FirstOrDefault(sl => sl.Name == listName);
-            return shoppingList?.Items;
+            ShoppingList list = shoppingLists.Find(x => x.Name == name);
+            if (list != null)
+            {
+                Console.WriteLine($"Список покупок {list.Name}:");
+                foreach (string item in list.Items)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Список покупок с именем {name} не найден");
+            }
+        }
+
+        public void SaveListsToJson()
+        {
+            string json = JsonConvert.SerializeObject(shoppingLists, Formatting.Indented);
+            File.WriteAllText("shoppingLists.json", json);
+            Console.WriteLine("Списки покупок сохранены в файле shoppingLists.json");
+        }
+
+        public void LoadListsFromJson()
+        {
+            if (File.Exists("shoppingLists.json"))
+            {
+                string json = File.ReadAllText("shoppingLists.json");
+                shoppingLists = JsonConvert.DeserializeObject<List<ShoppingList>>(json);
+                Console.WriteLine("Списки покупок загружены из файла shoppingLists.json");
+            }
+            else
+            {
+                Console.WriteLine("Файл shoppingLists.json не найден");
+            }
         }
     }
+
 }
